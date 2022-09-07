@@ -37,8 +37,8 @@ ifeq ($(NEED_BL32),yes)
 $(eval $(call add_define,QEMU_LOAD_BL32))
 endif
 
-PLAT_QEMU_PATH               :=      plat/qemu/qemu
-PLAT_QEMU_COMMON_PATH        :=      plat/qemu/common
+PLAT_QEMU_PATH               :=      plat/fake
+PLAT_QEMU_COMMON_PATH        :=      plat/fake/common
 PLAT_INCLUDES		:=	-Iinclude/plat/arm/common/		\
 				-I${PLAT_QEMU_COMMON_PATH}/include			\
 				-I${PLAT_QEMU_PATH}/include			\
@@ -108,12 +108,12 @@ ifeq (${MEASURED_BOOT},1)
         $(eval $(call add_define,TF_MBEDTLS_MBOOT_USE_SHA512))
     endif
 
-    BL2_SOURCES		+=	plat/qemu/qemu/qemu_measured_boot.c	\
-				plat/qemu/qemu/qemu_common_measured_boot.c	\
-				plat/qemu/qemu/qemu_helpers.c		\
+    BL2_SOURCES		+=	plat/fake/qemu_measured_boot.c	\
+				plat/fake/qemu_common_measured_boot.c	\
+				plat/fake/qemu_helpers.c		\
 				${EVENT_LOG_SOURCES}
 
-     BL1_SOURCES	+=      plat/qemu/qemu/qemu_bl1_measured_boot.c
+     BL1_SOURCES	+=      plat/fake/qemu_bl1_measured_boot.c
 
 endif
 
@@ -212,7 +212,7 @@ BL31_SOURCES		+=	lib/cpus/aarch64/aem_generic.S		\
 				${QEMU_GIC_SOURCES}
 
 ifeq (${SPD},spmd)
-BL31_SOURCES		+=	plat/qemu/common/qemu_spmd_manifest.c
+BL31_SOURCES		+=	plat/fake/common/qemu_spmd_manifest.c
 endif
 endif
 
