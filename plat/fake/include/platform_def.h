@@ -83,10 +83,10 @@
 #define NS_DRAM0_BASE			ULL(0x40000000)
 #define NS_DRAM0_SIZE			ULL(0xc0000000)
 
-#define SEC_SRAM_BASE			0x0e000000
+#define SEC_SRAM_BASE			0x08000000
 #define SEC_SRAM_SIZE			0x00060000
 
-#define SEC_DRAM_BASE			0x0e100000
+#define SEC_DRAM_BASE			0x08100000
 #define SEC_DRAM_SIZE			0x00f00000
 
 #define SECURE_GPIO_BASE		0x090b0000
@@ -191,7 +191,7 @@
 /*
  * PL011 related constants
  */
-#define UART0_BASE			0x09000000
+#define UART0_BASE			0x20000000
 #define UART1_BASE			0x09040000
 #define UART0_CLK_IN_HZ			1
 #define UART1_CLK_IN_HZ			1
@@ -212,18 +212,19 @@
 #define PLAT_QEMU_FIP_BASE		0x00040000
 #define PLAT_QEMU_FIP_MAX_SIZE		0x00400000
 
-#define DEVICE0_BASE			0x08000000
+// device 0: gic
+#define DEVICE0_BASE			0x10000000
 #define DEVICE0_SIZE			0x01000000
-#define DEVICE1_BASE			0x09000000
+// device 1: uart
+#define DEVICE1_BASE			UART0_BASE
 #define DEVICE1_SIZE			0x00c00000
 
 /*
  * GIC related constants
  */
-
-#define GICD_BASE			0x8000000
-#define GICC_BASE			0x8010000
-#define GICR_BASE			0x80A0000
+#define GICD_BASE			0x10010000
+#define GICC_BASE			0x10000000
+#define GICR_BASE			0x10020000
 
 
 #define QEMU_IRQ_SEC_SGI_0		8
