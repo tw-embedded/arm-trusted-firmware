@@ -87,7 +87,7 @@ static int qemu_set_event_log_info(uintptr_t config_base,
 
 	err = fdt_open_into(dtb, dtb, PLAT_QEMU_DT_MAX_SIZE);
 	if (err < 0) {
-		ERROR("Invalid Device Tree at %p: error %d\n", dtb, err);
+		ERROR("Invalid Device Tree at %p: error %d %s %s\n", dtb, err, __FUNCTION__, __FILE__);
 		return err;
 	}
 

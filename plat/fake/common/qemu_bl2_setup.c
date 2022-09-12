@@ -55,7 +55,7 @@ static void update_dt(void)
 
 	ret = fdt_open_into(fdt, fdt, PLAT_QEMU_DT_MAX_SIZE);
 	if (ret < 0) {
-		ERROR("Invalid Device Tree at %p: error %d\n", fdt, ret);
+		ERROR("Invalid Device Tree at %p: error %d %s %s\n", fdt, ret, __FUNCTION__, __FILE__);
 		return;
 	}
 

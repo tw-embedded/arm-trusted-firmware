@@ -89,7 +89,7 @@ int dt_add_ns_buf_node(uintptr_t *base)
 
 	err = fdt_open_into(fdt, fdt, PLAT_QEMU_DT_MAX_SIZE);
 	if (err < 0) {
-		ERROR("Invalid Device Tree at %p: error %d\n", fdt, err);
+		ERROR("Invalid Device Tree at %p: error %d %s\n", fdt, err, __FUNCTION__);
 		return err;
 	}
 
