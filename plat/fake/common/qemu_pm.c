@@ -219,14 +219,11 @@ static void __dead2 qemu_system_off(void)
 
 static void __dead2 qemu_system_reset(void)
 {
-	ERROR("QEMU System Reset: with GPIO.\n");
-#ifdef SECURE_GPIO_BASE
-	gpio_set_direction(SECURE_GPIO_RESET, GPIO_DIR_OUT);
-	gpio_set_value(SECURE_GPIO_RESET, GPIO_LEVEL_LOW);
-	gpio_set_value(SECURE_GPIO_RESET, GPIO_LEVEL_HIGH);
-#else
-	ERROR("QEMU System Reset: operation not handled.\n");
-#endif
+	ERROR("System Reset by misc device\n");
+
+	uint64_t *p = (uint64_t *) FAKE_MISC_BASE;
+	*p = 0x9070dead;
+
 	panic();
 }
 
