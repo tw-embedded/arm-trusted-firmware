@@ -12,7 +12,7 @@
 #include <arch_helpers.h>
 #include <common/bl_common.h>
 
-#include "qemu_private.h"
+#include "fake_private.h"
 
 /* Data structure which holds the extents of the trusted SRAM for BL1*/
 static meminfo_t bl1_tzram_layout;

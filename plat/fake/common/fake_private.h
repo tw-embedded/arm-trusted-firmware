@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef QEMU_PRIVATE_H
-#define QEMU_PRIVATE_H
+#ifndef FAKE_PRIVATE_H
+#define FAKE_PRIVATE_H
 
 #include <stdint.h>
 
@@ -48,4 +48,4 @@ int qemu_set_nt_fw_info(
 			size_t log_size,
 			uintptr_t *ns_log_addr);
 
-#endif /* QEMU_PRIVATE_H */
+#endif /* FAKE_PRIVATE_H */

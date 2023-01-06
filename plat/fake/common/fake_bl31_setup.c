@@ -10,7 +10,7 @@
 #include <drivers/arm/pl061_gpio.h>
 #include <plat/common/platform.h>
 
-#include "qemu_private.h"
+#include "fake_private.h"
 
 /*
  * Placeholder variables for copying the arguments that have been passed to

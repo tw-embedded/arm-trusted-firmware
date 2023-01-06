@@ -12,7 +12,7 @@
 #include <lib/xlat_tables/xlat_tables_v2.h>
 
 #include <plat/common/platform.h>
-#include "qemu_private.h"
+#include "fake_private.h"
 
 #define MAP_DEVICE0	MAP_REGION_FLAT(DEVICE0_BASE,			\
 					DEVICE0_SIZE,			\

@@ -11,7 +11,7 @@
 #include <plat/common/common_def.h>
 #include <tools_share/tbbr_oid.h>
 
-#include "../common/qemu_private.h"
+#include "../common/fake_private.h"
 
 /* Event Log data */
 static uint8_t event_log[PLAT_EVENT_LOG_MAX_SIZE];

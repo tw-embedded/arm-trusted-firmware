@@ -14,7 +14,7 @@
 #include <plat/common/platform.h>
 #include <drivers/gpio.h>
 
-#include "qemu_private.h"
+#include "fake_private.h"
 
 #define ADP_STOPPED_APPLICATION_EXIT 0x20026
 
