@@ -7,15 +7,12 @@
 #include <assert.h>
 #include <string.h>
 
-#include <libfdt.h>
-
 #include <platform_def.h>
 
 #include <arch_helpers.h>
 #include <common/bl_common.h>
 #include <common/debug.h>
 #include <common/desc_image_load.h>
-#include <common/fdt_fixup.h>
 #include <lib/optee_utils.h>
 #include <lib/utils.h>
 #include <plat/common/platform.h>
@@ -185,8 +182,7 @@ static int fake_bl2_handle_post_image_load(unsigned int image_id)
 		 * the device tree blob (DTB) in x0, while x1-x3 are reserved
 		 * for future use and must be 0.
 		 */
-		bl_mem_params->ep_info.args.arg0 =
-			(u_register_t)ARM_PRELOADED_DTB_BASE;
+		bl_mem_params->ep_info.args.arg0 = (u_register_t) ARM_PRELOADED_DTB_BASE;
 		bl_mem_params->ep_info.args.arg1 = 0U;
 		bl_mem_params->ep_info.args.arg2 = 0U;
 		bl_mem_params->ep_info.args.arg3 = 0U;

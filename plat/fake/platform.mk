@@ -31,8 +31,6 @@ $(eval $(call add_define,SPMC_OPTEE))
 add-lib-optee := yes
 endif
 
-include lib/libfdt/libfdt.mk
-
 ifeq ($(NEED_BL32),yes)
 $(eval $(call add_define,FAKE_LOAD_BL32))
 endif
@@ -156,8 +154,6 @@ BL2_SOURCES += drivers/io/io_semihosting.c \
                 ${PLAT_FAKE_COMMON_PATH}/fake_bl2_setup.c \
                 ${PLAT_FAKE_COMMON_PATH}/fake_bl2_mem_params_desc.c \
                 ${PLAT_FAKE_COMMON_PATH}/fake_image_load.c \
-                common/fdt_fixup.c \
-                common/fdt_wrappers.c \
                 common/desc_image_load.c
 
 ifeq ($(add-lib-optee),yes)
