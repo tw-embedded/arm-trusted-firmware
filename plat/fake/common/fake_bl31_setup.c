@@ -31,7 +31,7 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
 				u_register_t arg2, u_register_t arg3)
 {
 	/* Initialize the console to provide early debug support */
-	qemu_console_init();
+	fake_console_init();
 
 	/*
 	 * Check params passed from BL2
@@ -64,13 +64,13 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
 
 void bl31_plat_arch_setup(void)
 {
-	qemu_configure_mmu_el3(BL31_BASE, (BL31_END - BL31_BASE),
+	fake_configure_mmu_el3(BL31_BASE, (BL31_END - BL31_BASE),
 			      BL_CODE_BASE, BL_CODE_END,
 			      BL_RO_DATA_BASE, BL_RO_DATA_END,
 			      BL_COHERENT_RAM_BASE, BL_COHERENT_RAM_END);
 }
 
-static void qemu_gpio_init(void)
+static void fake_gpio_init(void)
 {
 #ifdef SECURE_GPIO_BASE
 	pl061_gpio_init();
@@ -80,8 +80,8 @@ static void qemu_gpio_init(void)
 
 void bl31_platform_setup(void)
 {
-	plat_qemu_gic_init();
-	qemu_gpio_init();
+	plat_fake_gic_init();
+	fake_gpio_init();
 }
 
 unsigned int plat_get_syscnt_freq2(void)

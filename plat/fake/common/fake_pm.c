@@ -26,20 +26,20 @@ static unsigned long secure_entrypoint;
 /* Make composite power state parameter till power level 0 */
 #if PSCI_EXTENDED_STATE_ID
 
-#define qemu_make_pwrstate_lvl0(lvl0_state, pwr_lvl, type) \
+#define fake_make_pwrstate_lvl0(lvl0_state, pwr_lvl, type) \
 		(((lvl0_state) << PSTATE_ID_SHIFT) | \
 		 ((type) << PSTATE_TYPE_SHIFT))
 #else
-#define qemu_make_pwrstate_lvl0(lvl0_state, pwr_lvl, type) \
+#define fake_make_pwrstate_lvl0(lvl0_state, pwr_lvl, type) \
 		(((lvl0_state) << PSTATE_ID_SHIFT) | \
 		 ((pwr_lvl) << PSTATE_PWR_LVL_SHIFT) | \
 		 ((type) << PSTATE_TYPE_SHIFT))
 #endif /* PSCI_EXTENDED_STATE_ID */
 
 
-#define qemu_make_pwrstate_lvl1(lvl1_state, lvl0_state, pwr_lvl, type) \
+#define fake_make_pwrstate_lvl1(lvl1_state, lvl0_state, pwr_lvl, type) \
 		(((lvl1_state) << PLAT_LOCAL_PSTATE_WIDTH) | \
-		 qemu_make_pwrstate_lvl0(lvl0_state, pwr_lvl, type))
+		 fake_make_pwrstate_lvl0(lvl0_state, pwr_lvl, type))
 
 
 
@@ -49,15 +49,15 @@ static unsigned long secure_entrypoint;
  *  enable us to use binary search during power state validation.
  *  The table must be terminated by a NULL entry.
  */
-static const unsigned int qemu_pm_idle_states[] = {
+static const unsigned int fake_pm_idle_states[] = {
 	/* State-id - 0x01 */
-	qemu_make_pwrstate_lvl1(PLAT_LOCAL_STATE_RUN, PLAT_LOCAL_STATE_RET,
+	fake_make_pwrstate_lvl1(PLAT_LOCAL_STATE_RUN, PLAT_LOCAL_STATE_RET,
 				MPIDR_AFFLVL0, PSTATE_TYPE_STANDBY),
 	/* State-id - 0x02 */
-	qemu_make_pwrstate_lvl1(PLAT_LOCAL_STATE_RUN, PLAT_LOCAL_STATE_OFF,
+	fake_make_pwrstate_lvl1(PLAT_LOCAL_STATE_RUN, PLAT_LOCAL_STATE_OFF,
 				MPIDR_AFFLVL0, PSTATE_TYPE_POWERDOWN),
 	/* State-id - 0x22 */
-	qemu_make_pwrstate_lvl1(PLAT_LOCAL_STATE_OFF, PLAT_LOCAL_STATE_OFF,
+	fake_make_pwrstate_lvl1(PLAT_LOCAL_STATE_OFF, PLAT_LOCAL_STATE_OFF,
 				MPIDR_AFFLVL1, PSTATE_TYPE_POWERDOWN),
 	0,
 };
@@ -66,7 +66,7 @@ static const unsigned int qemu_pm_idle_states[] = {
  * Platform handler called to check the validity of the power state
  * parameter. The power state parameter has to be a composite power state.
  ******************************************************************************/
-static int qemu_validate_power_state(unsigned int power_state,
+static int fake_validate_power_state(unsigned int power_state,
 				psci_power_state_t *req_state)
 {
 	unsigned int state_id;
@@ -79,13 +79,13 @@ static int qemu_validate_power_state(unsigned int power_state,
 	 *  entry in the idle power state array. This can be made a binary
 	 *  search if the number of entries justify the additional complexity.
 	 */
-	for (i = 0; !!qemu_pm_idle_states[i]; i++) {
-		if (power_state == qemu_pm_idle_states[i])
+	for (i = 0; !!fake_pm_idle_states[i]; i++) {
+		if (power_state == fake_pm_idle_states[i])
 			break;
 	}
 
 	/* Return error if entry not found in the idle state array */
-	if (!qemu_pm_idle_states[i])
+	if (!fake_pm_idle_states[i])
 		return PSCI_E_INVALID_PARAMS;
 
 	i = 0;
@@ -105,7 +105,7 @@ static int qemu_validate_power_state(unsigned int power_state,
  * Platform handler called to check the validity of the non secure
  * entrypoint.
  ******************************************************************************/
-static int qemu_validate_ns_entrypoint(uintptr_t entrypoint)
+static int fake_validate_ns_entrypoint(uintptr_t entrypoint)
 {
 	/*
 	 * Check if the non secure entrypoint lies within the non
@@ -120,7 +120,7 @@ static int qemu_validate_ns_entrypoint(uintptr_t entrypoint)
 /*******************************************************************************
  * Platform handler called when a CPU is about to enter standby.
  ******************************************************************************/
-static void qemu_cpu_standby(plat_local_state_t cpu_state)
+static void fake_cpu_standby(plat_local_state_t cpu_state)
 {
 
 	assert(cpu_state == PLAT_LOCAL_STATE_RET);
@@ -137,13 +137,13 @@ static void qemu_cpu_standby(plat_local_state_t cpu_state)
  * Platform handler called when a power domain is about to be turned on. The
  * mpidr determines the CPU to be turned on.
  ******************************************************************************/
-static int qemu_pwr_domain_on(u_register_t mpidr)
+static int fake_pwr_domain_on(u_register_t mpidr)
 {
 	int rc = PSCI_E_SUCCESS;
 	unsigned pos = plat_core_pos_by_mpidr(mpidr);
-	uint64_t *hold_base = (uint64_t *)PLAT_QEMU_HOLD_BASE;
+	uint64_t *hold_base = (uint64_t *)PLAT_FAKE_HOLD_BASE;
 
-	hold_base[pos] = PLAT_QEMU_HOLD_STATE_GO;
+	hold_base[pos] = PLAT_FAKE_HOLD_STATE_GO;
 	sev();
 
 	return rc;
@@ -153,15 +153,15 @@ static int qemu_pwr_domain_on(u_register_t mpidr)
  * Platform handler called when a power domain is about to be turned off. The
  * target_state encodes the power state that each level should transition to.
  ******************************************************************************/
-static void qemu_pwr_domain_off(const psci_power_state_t *target_state)
+static void fake_pwr_domain_off(const psci_power_state_t *target_state)
 {
-	qemu_pwr_gic_off();
+	fake_pwr_gic_off();
 }
 
 void __dead2 plat_secondary_cold_boot_setup(void);
 
 static void __dead2
-qemu_pwr_domain_pwr_down_wfi(const psci_power_state_t *target_state)
+fake_pwr_domain_pwr_down_wfi(const psci_power_state_t *target_state)
 {
 	disable_mmu_el3();
 	plat_secondary_cold_boot_setup();
@@ -171,7 +171,7 @@ qemu_pwr_domain_pwr_down_wfi(const psci_power_state_t *target_state)
  * Platform handler called when a power domain is about to be suspended. The
  * target_state encodes the power state that each level should transition to.
  ******************************************************************************/
-void qemu_pwr_domain_suspend(const psci_power_state_t *target_state)
+void fake_pwr_domain_suspend(const psci_power_state_t *target_state)
 {
 	assert(0);
 }
@@ -181,12 +181,12 @@ void qemu_pwr_domain_suspend(const psci_power_state_t *target_state)
  * being turned off earlier. The target_state encodes the low power state that
  * each level has woken up from.
  ******************************************************************************/
-void qemu_pwr_domain_on_finish(const psci_power_state_t *target_state)
+void fake_pwr_domain_on_finish(const psci_power_state_t *target_state)
 {
 	assert(target_state->pwr_domain_state[MPIDR_AFFLVL0] ==
 					PLAT_LOCAL_STATE_OFF);
 
-	qemu_pwr_gic_on_finish();
+	fake_pwr_gic_on_finish();
 }
 
 /*******************************************************************************
@@ -194,7 +194,7 @@ void qemu_pwr_domain_on_finish(const psci_power_state_t *target_state)
  * having been suspended earlier. The target_state encodes the low power state
  * that each level has woken up from.
  ******************************************************************************/
-void qemu_pwr_domain_suspend_finish(const psci_power_state_t *target_state)
+void fake_pwr_domain_suspend_finish(const psci_power_state_t *target_state)
 {
 	assert(0);
 }
@@ -203,21 +203,21 @@ void qemu_pwr_domain_suspend_finish(const psci_power_state_t *target_state)
  * Platform handlers to shutdown/reboot the system
  ******************************************************************************/
 
-static void __dead2 qemu_system_off(void)
+static void __dead2 fake_system_off(void)
 {
 #ifdef SECURE_GPIO_BASE
-	ERROR("QEMU System Power off: with GPIO.\n");
+	ERROR("System Power off: with GPIO.\n");
 	gpio_set_direction(SECURE_GPIO_POWEROFF, GPIO_DIR_OUT);
 	gpio_set_value(SECURE_GPIO_POWEROFF, GPIO_LEVEL_LOW);
 	gpio_set_value(SECURE_GPIO_POWEROFF, GPIO_LEVEL_HIGH);
 #else
 	semihosting_exit(ADP_STOPPED_APPLICATION_EXIT, 0);
-	ERROR("QEMU System Off: semihosting call unexpectedly returned.\n");
+	ERROR("System Off: semihosting call unexpectedly returned.\n");
 #endif
 	panic();
 }
 
-static void __dead2 qemu_system_reset(void)
+static void __dead2 fake_system_reset(void)
 {
 	ERROR("System Reset by misc device\n");
 
@@ -227,28 +227,28 @@ static void __dead2 qemu_system_reset(void)
 	panic();
 }
 
-static const plat_psci_ops_t plat_qemu_psci_pm_ops = {
-	.cpu_standby = qemu_cpu_standby,
-	.pwr_domain_on = qemu_pwr_domain_on,
-	.pwr_domain_off = qemu_pwr_domain_off,
-	.pwr_domain_pwr_down_wfi = qemu_pwr_domain_pwr_down_wfi,
-	.pwr_domain_suspend = qemu_pwr_domain_suspend,
-	.pwr_domain_on_finish = qemu_pwr_domain_on_finish,
-	.pwr_domain_suspend_finish = qemu_pwr_domain_suspend_finish,
-	.system_off = qemu_system_off,
-	.system_reset = qemu_system_reset,
-	.validate_power_state = qemu_validate_power_state,
-	.validate_ns_entrypoint = qemu_validate_ns_entrypoint
+static const plat_psci_ops_t plat_fake_psci_pm_ops = {
+	.cpu_standby = fake_cpu_standby,
+	.pwr_domain_on = fake_pwr_domain_on,
+	.pwr_domain_off = fake_pwr_domain_off,
+	.pwr_domain_pwr_down_wfi = fake_pwr_domain_pwr_down_wfi,
+	.pwr_domain_suspend = fake_pwr_domain_suspend,
+	.pwr_domain_on_finish = fake_pwr_domain_on_finish,
+	.pwr_domain_suspend_finish = fake_pwr_domain_suspend_finish,
+	.system_off = fake_system_off,
+	.system_reset = fake_system_reset,
+	.validate_power_state = fake_validate_power_state,
+	.validate_ns_entrypoint = fake_validate_ns_entrypoint
 };
 
 int plat_setup_psci_ops(uintptr_t sec_entrypoint,
 			const plat_psci_ops_t **psci_ops)
 {
-	uintptr_t *mailbox = (void *) PLAT_QEMU_TRUSTED_MAILBOX_BASE;
+	uintptr_t *mailbox = (void *) PLAT_FAKE_TRUSTED_MAILBOX_BASE;
 
 	*mailbox = sec_entrypoint;
 	secure_entrypoint = (unsigned long) sec_entrypoint;
-	*psci_ops = &plat_qemu_psci_pm_ops;
+	*psci_ops = &plat_fake_psci_pm_ops;
 
 	return 0;
 }

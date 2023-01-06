@@ -46,21 +46,21 @@ static bl_mem_params_node_t bl2_mem_params_descs[] = {
 	  .ep_info.spsr = SPSR_64(MODE_EL3, MODE_SP_ELX,
 				  DISABLE_ALL_EXCEPTIONS),
 # if DEBUG
-	  .ep_info.args.arg1 = QEMU_BL31_PLAT_PARAM_VAL,
+	  .ep_info.args.arg1 = FAKE_BL31_PLAT_PARAM_VAL,
 # endif
 	  SET_STATIC_PARAM_HEAD(image_info, PARAM_EP, VERSION_2, image_info_t,
 				IMAGE_ATTRIB_PLAT_SETUP),
 	  .image_info.image_base = BL31_BASE,
 	  .image_info.image_max_size = BL31_LIMIT - BL31_BASE,
 
-# ifdef QEMU_LOAD_BL32
+# ifdef FAKE_LOAD_BL32
 	  .next_handoff_image_id = BL32_IMAGE_ID,
 # else
 	  .next_handoff_image_id = BL33_IMAGE_ID,
 # endif
 	},
 #endif /* __aarch64__ */
-# ifdef QEMU_LOAD_BL32
+# ifdef FAKE_LOAD_BL32
 
 #ifdef __aarch64__
 #define BL32_EP_ATTRIBS		(SECURE | EXECUTABLE)
@@ -117,12 +117,12 @@ static bl_mem_params_node_t bl2_mem_params_descs[] = {
 	   SET_STATIC_PARAM_HEAD(image_info, PARAM_EP, VERSION_2,
 				 image_info_t, IMAGE_ATTRIB_SKIP_LOADING),
 #if defined(SPD_opteed) || defined(AARCH32_SP_OPTEE) || defined(SPMC_OPTEE)
-	   .image_info.image_base = QEMU_OPTEE_PAGEABLE_LOAD_BASE,
-	   .image_info.image_max_size = QEMU_OPTEE_PAGEABLE_LOAD_SIZE,
+	   .image_info.image_base = FAKE_OPTEE_PAGEABLE_LOAD_BASE,
+	   .image_info.image_max_size = FAKE_OPTEE_PAGEABLE_LOAD_SIZE,
 #endif
 	   .next_handoff_image_id = INVALID_IMAGE_ID,
 	},
-# endif /* QEMU_LOAD_BL32 */
+# endif /* FAKE_LOAD_BL32 */
 
 	/* Fill BL33 related information */
 	{ .image_id = BL33_IMAGE_ID,

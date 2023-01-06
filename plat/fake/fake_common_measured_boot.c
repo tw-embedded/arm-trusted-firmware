@@ -11,11 +11,11 @@
 #include <drivers/measured_boot/event_log/event_log.h>
 #include <plat/common/platform.h>
 
-extern event_log_metadata_t qemu_event_log_metadata[];
+extern event_log_metadata_t fake_event_log_metadata[];
 
 const event_log_metadata_t *plat_event_log_get_metadata(void)
 {
-	return qemu_event_log_metadata;
+	return fake_event_log_metadata;
 }
 
 int plat_mboot_measure_image(unsigned int image_id, image_info_t *image_data)

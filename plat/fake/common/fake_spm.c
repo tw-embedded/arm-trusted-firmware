@@ -19,12 +19,12 @@
 					DEVICE1_SIZE,			\
 					MT_DEVICE | MT_RW | MT_SECURE | MT_USER)
 
-mmap_region_t plat_qemu_secure_partition_mmap[] = {
-	QEMU_SP_IMAGE_NS_BUF_MMAP,	/* must be placed at first entry */
+mmap_region_t plat_fake_secure_partition_mmap[] = {
+	FAKE_SP_IMAGE_NS_BUF_MMAP,	/* must be placed at first entry */
 	MAP_DEVICE1_EL0,		/* for the UART */
-	QEMU_SP_IMAGE_MMAP,
-	QEMU_SPM_BUF_EL0_MMAP,
-	QEMU_SP_IMAGE_RW_MMAP,
+	FAKE_SP_IMAGE_MMAP,
+	FAKE_SPM_BUF_EL0_MMAP,
+	FAKE_SP_IMAGE_RW_MMAP,
 	MAP_SECURE_VARSTORE,
 	{0}
 };
@@ -32,34 +32,34 @@ mmap_region_t plat_qemu_secure_partition_mmap[] = {
 /* Boot information passed to a secure partition during initialisation. */
 static spm_mm_mp_info_t sp_mp_info[PLATFORM_CORE_COUNT];
 
-spm_mm_boot_info_t plat_qemu_secure_partition_boot_info = {
+spm_mm_boot_info_t plat_fake_secure_partition_boot_info = {
 	.h.type              = PARAM_SP_IMAGE_BOOT_INFO,
 	.h.version           = VERSION_1,
 	.h.size              = sizeof(spm_mm_boot_info_t),
 	.h.attr              = 0,
-	.sp_mem_base         = PLAT_QEMU_SP_IMAGE_BASE,
+	.sp_mem_base         = PLAT_FAKE_SP_IMAGE_BASE,
 	.sp_mem_limit        = BL32_LIMIT,
-	.sp_image_base       = PLAT_QEMU_SP_IMAGE_BASE,
+	.sp_image_base       = PLAT_FAKE_SP_IMAGE_BASE,
 	.sp_stack_base       = PLAT_SP_IMAGE_STACK_BASE,
-	.sp_heap_base        = PLAT_QEMU_SP_IMAGE_HEAP_BASE,
-	.sp_ns_comm_buf_base = PLAT_QEMU_SP_IMAGE_NS_BUF_BASE,
+	.sp_heap_base        = PLAT_FAKE_SP_IMAGE_HEAP_BASE,
+	.sp_ns_comm_buf_base = PLAT_FAKE_SP_IMAGE_NS_BUF_BASE,
 	.sp_shared_buf_base  = PLAT_SPM_BUF_BASE,
-	.sp_image_size       = PLAT_QEMU_SP_IMAGE_SIZE,
+	.sp_image_size       = PLAT_FAKE_SP_IMAGE_SIZE,
 	.sp_pcpu_stack_size  = PLAT_SP_IMAGE_STACK_PCPU_SIZE,
-	.sp_heap_size        = PLAT_QEMU_SP_IMAGE_HEAP_SIZE,
-	.sp_ns_comm_buf_size = PLAT_QEMU_SP_IMAGE_NS_BUF_SIZE,
+	.sp_heap_size        = PLAT_FAKE_SP_IMAGE_HEAP_SIZE,
+	.sp_ns_comm_buf_size = PLAT_FAKE_SP_IMAGE_NS_BUF_SIZE,
 	.sp_shared_buf_size  = PLAT_SPM_BUF_SIZE,
-	.num_sp_mem_regions  = PLAT_QEMU_SP_IMAGE_NUM_MEM_REGIONS,
+	.num_sp_mem_regions  = PLAT_FAKE_SP_IMAGE_NUM_MEM_REGIONS,
 	.num_cpus            = PLATFORM_CORE_COUNT,
 	.mp_info             = sp_mp_info
 };
 
-/* Enumeration of priority levels on QEMU platforms. */
-ehf_pri_desc_t qemu_exceptions[] = {
-	EHF_PRI_DESC(QEMU_PRI_BITS, PLAT_SP_PRI)
+/* Enumeration of priority levels on fake platforms. */
+ehf_pri_desc_t fake_exceptions[] = {
+	EHF_PRI_DESC(FAKE_PRI_BITS, PLAT_SP_PRI)
 };
 
-static void qemu_initialize_mp_info(spm_mm_mp_info_t *mp_info)
+static void fake_initialize_mp_info(spm_mm_mp_info_t *mp_info)
 {
 	unsigned int i, j;
 	spm_mm_mp_info_t *tmp = mp_info;
@@ -87,7 +87,7 @@ int dt_add_ns_buf_node(uintptr_t *base)
 	int err;
 	void *fdt = (void *)ARM_PRELOADED_DTB_BASE;
 
-	err = fdt_open_into(fdt, fdt, PLAT_QEMU_DT_MAX_SIZE);
+	err = fdt_open_into(fdt, fdt, PLAT_FAKE_DT_MAX_SIZE);
 	if (err < 0) {
 		ERROR("Invalid Device Tree at %p: error %d %s\n", fdt, err, __FUNCTION__);
 		return err;
@@ -106,12 +106,12 @@ int dt_add_ns_buf_node(uintptr_t *base)
 	}
 	INFO("System RAM @ 0x%lx - 0x%lx\n", addr, addr + size - 1);
 
-	ns_buf_addr = addr + (size - PLAT_QEMU_SP_IMAGE_NS_BUF_SIZE);
+	ns_buf_addr = addr + (size - PLAT_FAKE_SP_IMAGE_NS_BUF_SIZE);
 	INFO("reserved-memory for spm-mm @ 0x%lx - 0x%llx\n", ns_buf_addr,
-	     ns_buf_addr + PLAT_QEMU_SP_IMAGE_NS_BUF_SIZE - 1);
+	     ns_buf_addr + PLAT_FAKE_SP_IMAGE_NS_BUF_SIZE - 1);
 
 	err = fdt_add_reserved_memory(fdt, "ns-buf-spm-mm", ns_buf_addr,
-				      PLAT_QEMU_SP_IMAGE_NS_BUF_SIZE);
+				      PLAT_FAKE_SP_IMAGE_NS_BUF_SIZE);
 	if (err < 0) {
 		ERROR("Failed to add the reserved-memory node\n");
 		return err;
@@ -121,9 +121,9 @@ int dt_add_ns_buf_node(uintptr_t *base)
 	return 0;
 }
 
-/* Plug in QEMU exceptions to Exception Handling Framework. */
-EHF_REGISTER_PRIORITIES(qemu_exceptions, ARRAY_SIZE(qemu_exceptions),
-			QEMU_PRI_BITS);
+/* Plug in fake exceptions to Exception Handling Framework. */
+EHF_REGISTER_PRIORITIES(fake_exceptions, ARRAY_SIZE(fake_exceptions),
+			FAKE_PRI_BITS);
 
 const mmap_region_t *plat_get_secure_partition_mmap(void *cookie)
 {
@@ -131,17 +131,17 @@ const mmap_region_t *plat_get_secure_partition_mmap(void *cookie)
 
 	dt_add_ns_buf_node(&ns_buf_base);
 
-	plat_qemu_secure_partition_mmap[0].base_pa = ns_buf_base;
-	plat_qemu_secure_partition_mmap[0].base_va = ns_buf_base;
-	plat_qemu_secure_partition_boot_info.sp_ns_comm_buf_base = ns_buf_base;
+	plat_fake_secure_partition_mmap[0].base_pa = ns_buf_base;
+	plat_fake_secure_partition_mmap[0].base_va = ns_buf_base;
+	plat_fake_secure_partition_boot_info.sp_ns_comm_buf_base = ns_buf_base;
 
-	return plat_qemu_secure_partition_mmap;
+	return plat_fake_secure_partition_mmap;
 }
 
 const spm_mm_boot_info_t *
 plat_get_secure_partition_boot_info(void *cookie)
 {
-	qemu_initialize_mp_info(sp_mp_info);
+	fake_initialize_mp_info(sp_mp_info);
 
-	return &plat_qemu_secure_partition_boot_info;
+	return &plat_fake_secure_partition_boot_info;
 }

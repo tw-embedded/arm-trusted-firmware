@@ -18,7 +18,7 @@ static uint8_t event_log[PLAT_EVENT_LOG_MAX_SIZE];
 static uint64_t event_log_base;
 
 /* FVP table with platform specific image IDs, names and PCRs */
-const event_log_metadata_t qemu_event_log_metadata[] = {
+const event_log_metadata_t fake_event_log_metadata[] = {
 	{ BL31_IMAGE_ID, EVLOG_BL31_STRING, PCR_0 },
 	{ BL32_IMAGE_ID, EVLOG_BL32_STRING, PCR_0 },
 	{ BL32_EXTRA1_IMAGE_ID, EVLOG_BL32_EXTRA1_STRING, PCR_0 },
@@ -49,55 +49,4 @@ void bl2_plat_mboot_init(void)
 	 */
 
 	event_log_base = (uintptr_t)event_log;
-}
-
-void bl2_plat_mboot_finish(void)
-{
-	int rc;
-
-	/* Event Log address in Non-Secure memory */
-	uintptr_t ns_log_addr;
-
-	/* Event Log filled size */
-	size_t event_log_cur_size;
-
-	event_log_cur_size = event_log_get_cur_size((uint8_t *)event_log_base);
-
-	rc = qemu_set_nt_fw_info(
-#ifdef SPD_opteed
-			    (uintptr_t)event_log_base,
-#endif
-			    event_log_cur_size, &ns_log_addr);
-	if (rc != 0) {
-		ERROR("%s(): Unable to update %s_FW_CONFIG\n",
-		      __func__, "NT");
-		/*
-		 * It is a fatal error because on QEMU secure world software
-		 * assumes that a valid event log exists and will use it to
-		 * record the measurements into the fTPM or sw-tpm.
-		 * Note: In QEMU platform, OP-TEE uses nt_fw_config to get the
-		 * secure Event Log buffer address.
-		 */
-		panic();
-	}
-
-	/* Copy Event Log to Non-secure memory */
-	(void)memcpy((void *)ns_log_addr, (const void *)event_log_base,
-		     event_log_cur_size);
-
-	/* Ensure that the Event Log is visible in Non-secure memory */
-	flush_dcache_range(ns_log_addr, event_log_cur_size);
-
-#if defined(SPD_tspd) || defined(SPD_spmd)
-	/* Set Event Log data in TOS_FW_CONFIG */
-	rc = qemu_set_tos_fw_info((uintptr_t)event_log_base,
-				 event_log_cur_size);
-	if (rc != 0) {
-		ERROR("%s(): Unable to update %s_FW_CONFIG\n",
-		      __func__, "TOS");
-		panic();
-	}
-#endif /* defined(SPD_tspd) || defined(SPD_spmd) */
-
-	dump_event_log((uint8_t *)event_log_base, event_log_cur_size);
 }

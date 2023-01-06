@@ -54,8 +54,8 @@ static uintptr_t enc_dev_handle;
 #endif
 
 static const io_block_spec_t fip_block_spec = {
-	.offset = PLAT_QEMU_FIP_BASE,
-	.length = PLAT_QEMU_FIP_MAX_SIZE
+	.offset = PLAT_FAKE_FIP_BASE,
+	.length = PLAT_FAKE_FIP_MAX_SIZE
 };
 
 static const io_uuid_spec_t bl2_uuid_spec = {
@@ -370,7 +370,7 @@ static int open_semihosting(const uintptr_t spec)
 	return result;
 }
 
-void plat_qemu_io_setup(void)
+void plat_fake_io_setup(void)
 {
 	int io_result;
 

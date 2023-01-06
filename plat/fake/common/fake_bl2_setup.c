@@ -32,12 +32,12 @@ void bl2_early_platform_setup2(u_register_t arg0, u_register_t arg1,
 	meminfo_t *mem_layout = (void *)arg1;
 
 	/* Initialize the console to provide early debug support */
-	qemu_console_init();
+	fake_console_init();
 
 	/* Setup the BL2 memory layout */
 	bl2_tzram_layout = *mem_layout;
 
-	plat_qemu_io_setup();
+	plat_fake_io_setup();
 }
 
 static void security_setup(void)
@@ -56,14 +56,14 @@ void bl2_platform_setup(void)
 }
 
 #ifdef __aarch64__
-#define QEMU_CONFIGURE_BL2_MMU(...)	qemu_configure_mmu_el1(__VA_ARGS__)
+#define FAKE_CONFIGURE_BL2_MMU(...)	fake_configure_mmu_el1(__VA_ARGS__)
 #else
-#define QEMU_CONFIGURE_BL2_MMU(...)	qemu_configure_mmu_svc_mon(__VA_ARGS__)
+#define FAKE_CONFIGURE_BL2_MMU(...)	fake_configure_mmu_svc_mon(__VA_ARGS__)
 #endif
 
 void bl2_plat_arch_setup(void)
 {
-	QEMU_CONFIGURE_BL2_MMU(bl2_tzram_layout.total_base,
+	FAKE_CONFIGURE_BL2_MMU(bl2_tzram_layout.total_base,
 			      bl2_tzram_layout.total_size,
 			      BL_CODE_BASE, BL_CODE_END,
 			      BL_RO_DATA_BASE, BL_RO_DATA_END,
@@ -73,7 +73,7 @@ void bl2_plat_arch_setup(void)
 /*******************************************************************************
  * Gets SPSR for BL32 entry
  ******************************************************************************/
-static uint32_t qemu_get_spsr_for_bl32_entry(void)
+static uint32_t fake_get_spsr_for_bl32_entry(void)
 {
 #ifdef __aarch64__
 	/*
@@ -90,7 +90,7 @@ static uint32_t qemu_get_spsr_for_bl32_entry(void)
 /*******************************************************************************
  * Gets SPSR for BL33 entry
  ******************************************************************************/
-static uint32_t qemu_get_spsr_for_bl33_entry(void)
+static uint32_t fake_get_spsr_for_bl33_entry(void)
 {
 	uint32_t spsr;
 #ifdef __aarch64__
@@ -113,7 +113,7 @@ static uint32_t qemu_get_spsr_for_bl33_entry(void)
 	return spsr;
 }
 
-static int qemu_bl2_handle_post_image_load(unsigned int image_id)
+static int fake_bl2_handle_post_image_load(unsigned int image_id)
 {
 	int err = 0;
 	bl_mem_params_node_t *bl_mem_params = get_bl_mem_params_node(image_id);
@@ -167,7 +167,7 @@ static int qemu_bl2_handle_post_image_load(unsigned int image_id)
 		bl_mem_params->ep_info.args.arg2 = ARM_PRELOADED_DTB_BASE;
 		bl_mem_params->ep_info.args.arg3 = 0;
 #endif
-		bl_mem_params->ep_info.spsr = qemu_get_spsr_for_bl32_entry();
+		bl_mem_params->ep_info.spsr = fake_get_spsr_for_bl32_entry();
 		break;
 
 	case BL33_IMAGE_ID:
@@ -195,7 +195,7 @@ static int qemu_bl2_handle_post_image_load(unsigned int image_id)
 		bl_mem_params->ep_info.args.arg0 = 0xffff & read_mpidr();
 #endif
 
-		bl_mem_params->ep_info.spsr = qemu_get_spsr_for_bl33_entry();
+		bl_mem_params->ep_info.spsr = fake_get_spsr_for_bl33_entry();
 		break;
 	default:
 		/* Do nothing in default case */
@@ -211,7 +211,7 @@ static int qemu_bl2_handle_post_image_load(unsigned int image_id)
  ******************************************************************************/
 int bl2_plat_handle_post_image_load(unsigned int image_id)
 {
-	return qemu_bl2_handle_post_image_load(image_id);
+	return fake_bl2_handle_post_image_load(image_id);
 }
 
 uintptr_t plat_get_ns_image_entrypoint(void)

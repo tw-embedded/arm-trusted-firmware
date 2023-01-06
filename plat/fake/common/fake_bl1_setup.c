@@ -29,7 +29,7 @@ meminfo_t *bl1_plat_sec_mem_layout(void)
 void bl1_early_platform_setup(void)
 {
 	/* Initialize the console to provide early debug support */
-	qemu_console_init();
+	fake_console_init();
 
 	/* Allow BL1 to see the whole Trusted RAM */
 	bl1_tzram_layout.total_base = BL_RAM_BASE;
@@ -42,14 +42,14 @@ void bl1_early_platform_setup(void)
  * does not do anything platform specific.
  *****************************************************************************/
 #ifdef __aarch64__
-#define QEMU_CONFIGURE_BL1_MMU(...)	qemu_configure_mmu_el3(__VA_ARGS__)
+#define FAKE_CONFIGURE_BL1_MMU(...)	fake_configure_mmu_el3(__VA_ARGS__)
 #else
-#define QEMU_CONFIGURE_BL1_MMU(...)	qemu_configure_mmu_svc_mon(__VA_ARGS__)
+#define FAKE_CONFIGURE_BL1_MMU(...)	fake_configure_mmu_svc_mon(__VA_ARGS__)
 #endif
 
 void bl1_plat_arch_setup(void)
 {
-	QEMU_CONFIGURE_BL1_MMU(bl1_tzram_layout.total_base,
+	FAKE_CONFIGURE_BL1_MMU(bl1_tzram_layout.total_base,
 				bl1_tzram_layout.total_size,
 				BL_CODE_BASE, BL1_CODE_END,
 				BL1_RO_DATA_BASE, BL1_RO_DATA_END,
@@ -58,5 +58,5 @@ void bl1_plat_arch_setup(void)
 
 void bl1_platform_setup(void)
 {
-	plat_qemu_io_setup();
+	plat_fake_io_setup();
 }

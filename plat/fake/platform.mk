@@ -110,7 +110,6 @@ ifeq (${MEASURED_BOOT},1)
 
     BL2_SOURCES += plat/fake/fake_measured_boot.c \
                 plat/fake/fake_common_measured_boot.c \
-                plat/fake/fake_helpers.c \
                 ${EVENT_LOG_SOURCES}
 
      BL1_SOURCES += plat/fake/fake_bl1_measured_boot.c
@@ -257,4 +256,3 @@ $(eval $(call add_define,ARM_PRELOADED_DTB_BASE))
 
 # Do not enable SVE
 ENABLE_SVE_FOR_NS := 0
-

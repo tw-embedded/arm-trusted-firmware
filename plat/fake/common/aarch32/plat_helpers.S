@@ -12,7 +12,7 @@
 	.globl	plat_my_core_pos
 	.globl	plat_get_my_entrypoint
 	.globl	platform_mem_init
-	.globl	plat_qemu_calc_core_pos
+	.globl	plat_fake_calc_core_pos
 	.globl	plat_crash_console_init
 	.globl	plat_crash_console_putc
 	.globl	plat_crash_console_flush
@@ -23,19 +23,19 @@
 
 func plat_my_core_pos
 	ldcopr	r0, MPIDR
-	b	plat_qemu_calc_core_pos
+	b	plat_fake_calc_core_pos
 endfunc plat_my_core_pos
 
 /*
- *  unsigned int plat_qemu_calc_core_pos(u_register_t mpidr);
+ *  unsigned int plat_fake_calc_core_pos(u_register_t mpidr);
  *  With this function: CorePos = (ClusterId * 4) + CoreId
  */
-func plat_qemu_calc_core_pos
+func plat_fake_calc_core_pos
 	and	r1, r0, #MPIDR_CPU_MASK
 	and	r0, r0, #MPIDR_CLUSTER_MASK
 	add	r0, r1, r0, LSR #6
 	bx	lr
-endfunc plat_qemu_calc_core_pos
+endfunc plat_fake_calc_core_pos
 
 	/* -----------------------------------------------------
 	 * unsigned int plat_is_my_cpu_primary (void);
@@ -48,7 +48,7 @@ func plat_is_my_cpu_primary
 	ldcopr	r0, MPIDR
 	ldr	r1, =(MPIDR_CLUSTER_MASK | MPIDR_CPU_MASK)
 	and	r0, r1
-	cmp	r0, #QEMU_PRIMARY_CPU
+	cmp	r0, #FAKE_PRIMARY_CPU
 	moveq	r0, #1
 	movne	r0, #0
 	bx	lr
@@ -66,21 +66,21 @@ endfunc plat_is_my_cpu_primary
 func plat_secondary_cold_boot_setup
 	/* Calculate address of our hold entry */
 	bl	plat_my_core_pos
-	lsl	r0, r0, #PLAT_QEMU_HOLD_ENTRY_SHIFT
-	mov_imm	r2, PLAT_QEMU_HOLD_BASE
+	lsl	r0, r0, #PLAT_FAKE_HOLD_ENTRY_SHIFT
+	mov_imm	r2, PLAT_FAKE_HOLD_BASE
 
 	/* Wait until we have a go */
 poll_mailbox:
 	ldr	r1, [r2, r0]
-        cmp     r1, #PLAT_QEMU_HOLD_STATE_WAIT
+        cmp     r1, #PLAT_FAKE_HOLD_STATE_WAIT
         beq     1f
 
 	/* Clear the mailbox again ready for next time. */
-	mov r1, #PLAT_QEMU_HOLD_STATE_WAIT
+	mov r1, #PLAT_FAKE_HOLD_STATE_WAIT
 	str r1, [r2, r0]
 
 	/* Jump to the provided entrypoint. */
-	mov_imm	r0, PLAT_QEMU_TRUSTED_MAILBOX_BASE
+	mov_imm	r0, PLAT_FAKE_TRUSTED_MAILBOX_BASE
 	ldr	r1, [r0]
 	bx	r1
 1:
@@ -106,9 +106,9 @@ endfunc platform_mem_init
 	 * ---------------------------------------------
 	 */
 func plat_crash_console_init
-	mov_imm	r0, PLAT_QEMU_CRASH_UART_BASE
-	mov_imm	r1, PLAT_QEMU_CRASH_UART_CLK_IN_HZ
-	mov_imm	r2, PLAT_QEMU_CONSOLE_BAUDRATE
+	mov_imm	r0, PLAT_FAKE_CRASH_UART_BASE
+	mov_imm	r1, PLAT_FAKE_CRASH_UART_CLK_IN_HZ
+	mov_imm	r2, PLAT_FAKE_CONSOLE_BAUDRATE
 	b	console_pl011_core_init
 endfunc plat_crash_console_init
 
@@ -120,7 +120,7 @@ endfunc plat_crash_console_init
 	 * ---------------------------------------------
 	 */
 func plat_crash_console_putc
-	mov_imm	r1, PLAT_QEMU_CRASH_UART_BASE
+	mov_imm	r1, PLAT_FAKE_CRASH_UART_BASE
 	b	console_pl011_core_putc
 endfunc plat_crash_console_putc
 
@@ -133,7 +133,7 @@ endfunc plat_crash_console_putc
 	 * ---------------------------------------------
 	 */
 func plat_crash_console_flush
-	mov_imm	r0, PLAT_QEMU_CRASH_UART_BASE
+	mov_imm	r0, PLAT_FAKE_CRASH_UART_BASE
 	b	console_pl011_core_flush
 endfunc plat_crash_console_flush
 

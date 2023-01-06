@@ -40,10 +40,10 @@
 #define MAP_NS_DRAM0	MAP_REGION_FLAT(NS_DRAM0_BASE, NS_DRAM0_SIZE,	\
 					MT_MEMORY | MT_RW | MT_NS)
 
-#define MAP_FLASH0	MAP_REGION_FLAT(QEMU_FLASH0_BASE, QEMU_FLASH0_SIZE, \
+#define MAP_FLASH0	MAP_REGION_FLAT(FAKE_FLASH0_BASE, FAKE_FLASH0_SIZE, \
 					MT_MEMORY | MT_RO | MT_SECURE)
 
-#define MAP_FLASH1	MAP_REGION_FLAT(QEMU_FLASH1_BASE, QEMU_FLASH1_SIZE, \
+#define MAP_FLASH1	MAP_REGION_FLAT(FAKE_FLASH1_BASE, FAKE_FLASH1_SIZE, \
 					MT_MEMORY | MT_RO | MT_SECURE)
 
 /*
@@ -52,7 +52,7 @@
  * arm_configure_mmu_elx() will give the available subset of that,
  */
 #ifdef IMAGE_BL1
-static const mmap_region_t plat_qemu_mmap[] = {
+static const mmap_region_t plat_fake_mmap[] = {
 	MAP_FLASH0,
 	MAP_FLASH1,
 	MAP_SHARED_RAM,
@@ -67,7 +67,7 @@ static const mmap_region_t plat_qemu_mmap[] = {
 };
 #endif
 #ifdef IMAGE_BL2
-static const mmap_region_t plat_qemu_mmap[] = {
+static const mmap_region_t plat_fake_mmap[] = {
 	MAP_FLASH0,
 	MAP_FLASH1,
 	MAP_SHARED_RAM,
@@ -80,7 +80,7 @@ static const mmap_region_t plat_qemu_mmap[] = {
 #endif
 	MAP_NS_DRAM0,
 #if SPM_MM
-	QEMU_SP_IMAGE_MMAP,
+	FAKE_SP_IMAGE_MMAP,
 #else
 	MAP_BL32_MEM,
 #endif
@@ -88,7 +88,7 @@ static const mmap_region_t plat_qemu_mmap[] = {
 };
 #endif
 #ifdef IMAGE_BL31
-static const mmap_region_t plat_qemu_mmap[] = {
+static const mmap_region_t plat_fake_mmap[] = {
 	MAP_SHARED_RAM,
 	MAP_DEVICE0,
 #ifdef MAP_DEVICE1
@@ -99,7 +99,7 @@ static const mmap_region_t plat_qemu_mmap[] = {
 #endif
 #if SPM_MM
 	MAP_NS_DRAM0,
-	QEMU_SPM_BUF_EL3_MMAP,
+	FAKE_SPM_BUF_EL3_MMAP,
 #else
 	MAP_BL32_MEM,
 #endif
@@ -107,7 +107,7 @@ static const mmap_region_t plat_qemu_mmap[] = {
 };
 #endif
 #ifdef IMAGE_BL32
-static const mmap_region_t plat_qemu_mmap[] = {
+static const mmap_region_t plat_fake_mmap[] = {
 	MAP_SHARED_RAM,
 	MAP_DEVICE0,
 #ifdef MAP_DEVICE1
@@ -126,7 +126,7 @@ static const mmap_region_t plat_qemu_mmap[] = {
  ******************************************************************************/
 
 #define DEFINE_CONFIGURE_MMU_EL(_el)					\
-	void qemu_configure_mmu_##_el(unsigned long total_base,	\
+	void fake_configure_mmu_##_el(unsigned long total_base,	\
 				   unsigned long total_size,		\
 				   unsigned long code_start,		\
 				   unsigned long code_limit,		\
@@ -147,7 +147,7 @@ static const mmap_region_t plat_qemu_mmap[] = {
 		mmap_add_region(coh_start, coh_start,			\
 				coh_limit - coh_start,			\
 				MT_DEVICE | MT_RW | MT_SECURE);		\
-		mmap_add(plat_qemu_mmap);				\
+		mmap_add(plat_fake_mmap);				\
 		init_xlat_tables();					\
 									\
 		enable_mmu_##_el(0);					\

@@ -11,11 +11,11 @@
 
 static console_t console;
 
-void qemu_console_init(void)
+void fake_console_init(void)
 {
-	(void)console_pl011_register(PLAT_QEMU_BOOT_UART_BASE,
-			       PLAT_QEMU_BOOT_UART_CLK_IN_HZ,
-			       PLAT_QEMU_CONSOLE_BAUDRATE, &console);
+	(void)console_pl011_register(PLAT_FAKE_BOOT_UART_BASE,
+			       PLAT_FAKE_BOOT_UART_CLK_IN_HZ,
+			       PLAT_FAKE_CONSOLE_BAUDRATE, &console);
 
 	console_set_scope(&console, CONSOLE_FLAG_BOOT |
 			  CONSOLE_FLAG_RUNTIME);

@@ -6,13 +6,13 @@
 
 #include <plat/common/platform.h>
 
-extern char qemu_rotpk_hash[], qemu_rotpk_hash_end[];
+extern char fake_rotpk_hash[], fake_rotpk_hash_end[];
 
 int plat_get_rotpk_info(void *cookie, void **key_ptr, unsigned int *key_len,
 			unsigned int *flags)
 {
-	*key_ptr = qemu_rotpk_hash;
-	*key_len = qemu_rotpk_hash_end - qemu_rotpk_hash;
+	*key_ptr = fake_rotpk_hash;
+	*key_len = fake_rotpk_hash_end - fake_rotpk_hash;
 	*flags = ROTPK_IS_HASH;
 
 	return 0;
