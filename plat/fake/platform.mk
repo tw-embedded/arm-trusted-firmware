@@ -247,8 +247,9 @@ ARM_LINUX_KERNEL_AS_BL33 := 0
 $(eval $(call assert_boolean,ARM_LINUX_KERNEL_AS_BL33))
 $(eval $(call add_define,ARM_LINUX_KERNEL_AS_BL33))
 
-#ARM_PRELOADED_DTB_BASE := PLAT_FAKE_DT_BASE
-#$(eval $(call add_define,ARM_PRELOADED_DTB_BASE))
+#FDT_SOURCES := fdts/fake.dts
+ARM_PRELOADED_DTB_BASE := PLAT_FAKE_DT_BASE
+$(eval $(call add_define,ARM_PRELOADED_DTB_BASE))
 
 # Do not enable SVE
 ENABLE_SVE_FOR_NS := 0

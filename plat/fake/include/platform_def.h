@@ -263,6 +263,12 @@
 #define PLATFORM_G0_PROPS(grp)
 
 /*
+ * DT related constants
+ */
+#define PLAT_FAKE_DT_BASE		NS_DRAM0_BASE
+#define PLAT_FAKE_DT_MAX_SIZE		0x100000
+
+/*
  * System counter
  */
 #define SYS_COUNTER_FREQ_IN_TICKS	((1000 * 1000 * 1000) / 16)
