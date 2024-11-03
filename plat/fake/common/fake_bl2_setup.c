@@ -13,6 +13,8 @@
 #include <common/bl_common.h>
 #include <common/debug.h>
 #include <common/desc_image_load.h>
+#include <lib/fconf/fconf.h>
+#include <lib/fconf/fconf_dyn_cfg_getter.h>
 #include <lib/optee_utils.h>
 #include <lib/utils.h>
 #include <plat/common/platform.h>
@@ -156,6 +158,13 @@ static int fake_bl2_handle_post_image_load(unsigned int image_id)
 		 * OP-TEE expect to receive DTB address in x2.
 		 * This will be copied into x2 by dispatcher.
 		 */
+		const struct dyn_cfg_dtb_info_t *fw_config_info;
+		fw_config_info = FCONF_GET_PROPERTY(dyn_cfg, dtb, TB_FW_CONFIG_ID);
+		if (fw_config_info != NULL) {
+			INFO("dtb address %lx\n", fw_config_info->config_addr);
+		} else {
+			ERROR("dtb cannot find\n");
+		}
 		bl_mem_params->ep_info.args.arg3 = ARM_PRELOADED_DTB_BASE;
 #elif defined(AARCH32_SP_OPTEE)
 		bl_mem_params->ep_info.args.arg0 =

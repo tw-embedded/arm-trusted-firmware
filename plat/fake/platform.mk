@@ -247,7 +247,18 @@ ARM_LINUX_KERNEL_AS_BL33 := 0
 $(eval $(call assert_boolean,ARM_LINUX_KERNEL_AS_BL33))
 $(eval $(call add_define,ARM_LINUX_KERNEL_AS_BL33))
 
-#FDT_SOURCES := fdts/fake.dts
+FDT_SOURCES := plat/fake/fdt/fake_tb_fw_config.dts
+TB_FW_CONFIG := ${BUILD_PLAT}/fdts/fake_tb_fw_config.dtb
+
+# Add the TB_FW_CONFIG to FIP and specify the same to certtool
+$(eval $(call TOOL_ADD_PAYLOAD,${TB_FW_CONFIG},--tb-fw-config,${TB_FW_CONFIG}))
+# Add the FW_CONFIG to FIP and specify the same to certtool
+#$(eval $(call TOOL_ADD_PAYLOAD,${FW_CONFIG},--fw-config,${FW_CONFIG}))
+
+include lib/libfdt/libfdt.mk
+include lib/fconf/fconf.mk
+BL2_SOURCES		+=	${FCONF_SOURCES} ${FCONF_DYN_SOURCES}
+
 ARM_PRELOADED_DTB_BASE := PLAT_FAKE_DT_BASE
 $(eval $(call add_define,ARM_PRELOADED_DTB_BASE))
 

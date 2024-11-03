@@ -60,3 +60,4 @@ void bl1_platform_setup(void)
 {
 	plat_fake_io_setup();
 }
+

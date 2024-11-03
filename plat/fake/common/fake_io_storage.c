@@ -24,9 +24,11 @@
 #define BL2_IMAGE_NAME			"bl2.bin"
 #define BL31_IMAGE_NAME			"bl31.bin"
 #define BL32_IMAGE_NAME			"bl32.bin"
-#define BL32_EXTRA1_IMAGE_NAME		"bl32_extra1.bin"
-#define BL32_EXTRA2_IMAGE_NAME		"bl32_extra2.bin"
+#define BL32_EXTRA1_IMAGE_NAME		"tee-pager_v2.bin"
+#define BL32_EXTRA2_IMAGE_NAME		"tee-pageable_v2.bin"
 #define BL33_IMAGE_NAME			"bl33.bin"
+
+#define TB_FW_CONFIG_IMAGE_NAME		"fake_tb_fw_config.dtb"
 
 #if TRUSTED_BOARD_BOOT
 #define TRUSTED_BOOT_FW_CERT_NAME	"tb_fw.crt"
@@ -80,6 +82,10 @@ static const io_uuid_spec_t bl32_extra2_uuid_spec = {
 
 static const io_uuid_spec_t bl33_uuid_spec = {
 	.uuid = UUID_NON_TRUSTED_FIRMWARE_BL33,
+};
+
+static const io_uuid_spec_t tb_fw_config_uuid_spec = {
+	.uuid = UUID_TB_FW_CONFIG,
 };
 
 #if TRUSTED_BOARD_BOOT
@@ -140,6 +146,10 @@ static const io_file_spec_t sh_file_spec[] = {
 	[BL33_IMAGE_ID] = {
 		.path = BL33_IMAGE_NAME,
 		.mode = FOPEN_MODE_RB
+	},
+	[TB_FW_CONFIG_ID] = {
+		.path = TB_FW_CONFIG_IMAGE_NAME,
+                .mode = FOPEN_MODE_RB
 	},
 #if TRUSTED_BOARD_BOOT
 	[TRUSTED_BOOT_FW_CERT_ID] = {
@@ -255,6 +265,11 @@ static const struct plat_io_policy policies[] = {
 	[BL33_IMAGE_ID] = {
 		&fip_dev_handle,
 		(uintptr_t)&bl33_uuid_spec,
+		open_fip
+	},
+	[TB_FW_CONFIG_ID] = {
+		&fip_dev_handle,
+		(uintptr_t)&tb_fw_config_uuid_spec,
 		open_fip
 	},
 #if TRUSTED_BOARD_BOOT

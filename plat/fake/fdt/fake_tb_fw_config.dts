@@ -1,0 +1,11 @@
+/dts-v1/;
+
+/ {
+	tb_fw-config {
+		compatible = "arm,tb_fw";
+
+		/* Disable authentication for development */
+		disable_auth = <0x0>;
+	};
+};
+
