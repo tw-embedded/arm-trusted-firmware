@@ -448,13 +448,12 @@ TF_LDFLAGS		+=	$(call ld_option, --no-warn-rwx-segments)
 
 # ld.lld doesn't recognize the errata flags,
 # therefore don't add those in that case
+# ld.lld reports section type mismatch warnings,
+# therefore don't add --fatal-warnings to it.
 ifeq ($(findstring ld.lld,$(notdir $(LD))),)
 TF_LDFLAGS		+=	$(TF_LDFLAGS_$(ARCH))
 endif
-
-# ld.lld reports section type mismatch warnings,
-# therefore don't add --fatal-warnings to it.
-ifneq ($($(ARCH)-ld-id),llvm-lld)
+ifeq ($($(ARCH)-ld-id),llvm-lld)
 TF_LDFLAGS	+=	--fatal-warnings
 endif
 endif
