@@ -440,7 +440,7 @@ TF_LDFLAGS		+=	$(subst --,-Xlinker --,$(TF_LDFLAGS_$(ARCH)))
 
 # LD = gcc-ld (ld) or llvm-ld (ld.lld) or other
 else
-TF_LDFLAGS		+=	--fatal-warnings -O1
+TF_LDFLAGS		+=	-O1
 TF_LDFLAGS		+=	--gc-sections
 # With ld.bfd version 2.39 and newer new warnings are added. Skip those since we
 # are not loaded by a elf loader.
@@ -450,6 +450,12 @@ TF_LDFLAGS		+=	$(call ld_option, --no-warn-rwx-segments)
 # therefore don't add those in that case
 ifeq ($(findstring ld.lld,$(notdir $(LD))),)
 TF_LDFLAGS		+=	$(TF_LDFLAGS_$(ARCH))
+endif
+
+# ld.lld reports section type mismatch warnings,
+# therefore don't add --fatal-warnings to it.
+ifneq ($($(ARCH)-ld-id),llvm-lld)
+TF_LDFLAGS	+=	--fatal-warnings
 endif
 endif
 
